@@ -1,0 +1,137 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>MKFARMA</title>
+<style>
+*{box-sizing:border-box}body{margin:0;font-family:Arial,sans-serif;background:#eef8f5;color:#18332c}
+.app{max-width:520px;min-height:100vh;margin:auto;background:#fff}
+header{padding:26px 20px 30px;color:white;background:linear-gradient(135deg,#087f5b,#0ca678);border-radius:0 0 28px 28px}
+h1{margin:0;font-size:27px}.sub{margin-top:5px;opacity:.9;font-size:13px}
+main{padding:18px}.search{display:flex;gap:8px;background:#f3f7f6;padding:8px;border-radius:15px;border:1px solid #dce9e5}
+#q{min-width:0;flex:1;border:0;outline:0;background:transparent;padding:10px;font-size:16px}
+button{border:0;border-radius:11px;background:#087f5b;color:#fff;font-weight:700;padding:11px 15px;cursor:pointer}
+.section{margin-top:14px}.title{font-weight:800;font-size:16px;margin-bottom:8px}
+.chips{display:flex;gap:7px;flex-wrap:wrap}.chip{background:#fff;border:1px solid #cfe2dc;color:#087f5b;border-radius:20px;padding:8px 11px;font-size:12px;cursor:pointer}
+.card{margin-top:12px;padding:17px;border:1px solid #e0ebe7;border-radius:18px;box-shadow:0 5px 18px #174d3d0b}
+.name{font-size:20px;font-weight:800}.muted{color:#6b7f79;font-size:13px;margin:4px 0 13px}
+.badges{display:flex;gap:7px;flex-wrap:wrap}.badge{padding:7px 10px;border-radius:9px;font-size:12px;font-weight:700}
+.ok{background:#e7f7f1;color:#087f5b}.warn{background:#fff0ef;color:#c92a2a}.blue{background:#edf1ff;color:#4263eb}
+.row{display:flex;justify-content:space-between;gap:15px;padding:11px 0;border-top:1px solid #edf2f0;margin-top:10px;font-size:13px}
+.info{background:#f7faf9;border:1px solid #e3ece9;border-radius:11px;padding:11px;margin-top:9px;font-size:13px;line-height:1.45}
+.info b{display:block;color:#087f5b;margin-bottom:3px}.notice{margin-top:11px;background:#fff8e6;padding:11px;border-radius:10px;font-size:12px}
+.form{display:none}.form input,.form textarea,.form select{width:100%;padding:11px;margin-top:8px;border:1px solid #d5e4df;border-radius:10px;font:inherit}.form textarea{min-height:70px;resize:vertical}
+.empty{text-align:center;color:#6b7f79;padding:35px 10px}.error{color:#b42318;background:#fff0ef;padding:12px;border-radius:10px;margin-top:10px;font-size:13px}
+</style>
+</head>
+<body>
+<div class="app">
+<header><h1>💊 MKFARMA</h1><div class="sub">Consulta rápida de medicamentos</div></header>
+<main>
+<div class="search">
+<input id="q" type="search" autocomplete="off" placeholder="Nome ou princípio ativo">
+<button id="btnBuscar" type="button">Buscar</button>
+</div>
+
+<div class="section">
+<div class="title">🔥 Medicamentos populares</div>
+<div class="chips">
+<button class="chip" type="button" data-search="Dipirona">Dipirona</button>
+<button class="chip" type="button" data-search="Paracetamol">Paracetamol</button>
+<button class="chip" type="button" data-search="Ibuprofeno">Ibuprofeno</button>
+<button class="chip" type="button" data-search="Amoxicilina">Amoxicilina</button>
+<button class="chip" type="button" data-search="Azitromicina">Azitromicina</button>
+<button class="chip" type="button" data-search="Loratadina">Loratadina</button>
+<button class="chip" type="button" data-search="Omeprazol">Omeprazol</button>
+<button class="chip" type="button" data-search="Losartana">Losartana</button>
+<button class="chip" type="button" data-search="Metformina">Metformina</button>
+<button class="chip" type="button" data-search="Clonazepam">Clonazepam</button>
+</div>
+</div>
+
+<div class="section"><button id="btnCadastro" type="button">＋ Cadastrar medicamento</button></div>
+<div id="cadastro" class="card form">
+<div class="title">Cadastrar medicamento</div>
+<input id="nome" placeholder="Nome do medicamento">
+<input id="ativo" placeholder="Princípio ativo">
+<input id="receita" placeholder="Tipo de receita">
+<select id="ret"><option value="Não">Não retém receita</option><option value="Sim">Retém receita</option></select>
+<input id="tipo" placeholder="Categoria / tipo">
+<textarea id="modo" placeholder="Modo de uso"></textarea>
+<textarea id="posologia" placeholder="Posologia / orientação"></textarea>
+<button id="btnSalvar" type="button" style="margin-top:8px">Salvar</button>
+</div>
+
+<div id="resultado" class="empty">Digite um medicamento ou toque em um dos populares.</div>
+</main>
+</div>
+
+<script>
+(function(){
+"use strict";
+const base={
+"dipirona":{nome:"Dipirona",ativo:"dipirona",receita:"Não exige receita para dispensação comum",tipo:"MIP / isento de receita",ret:"Não",modo:"Uso conforme a apresentação e a bula.",posologia:"Confira concentração e bula antes de informar a dose.",obs:"Confirme a apresentação e as contraindicações."},
+"paracetamol":{nome:"Paracetamol",ativo:"paracetamol",receita:"Não exige receita para dispensação comum",tipo:"MIP / isento de receita",ret:"Não",modo:"Uso conforme a apresentação e a bula.",posologia:"Confira concentração e bula antes de informar a dose.",obs:"Não exceda a dose indicada na bula."},
+"ibuprofeno":{nome:"Ibuprofeno",ativo:"ibuprofeno",receita:"Verificar apresentação",tipo:"Conforme apresentação",ret:"Verificar",modo:"Uso conforme bula ou prescrição.",posologia:"A dose depende da apresentação e indicação.",obs:"Verifique contraindicações e apresentação."},
+"amoxicilina":{nome:"Amoxicilina",ativo:"amoxicilina",receita:"Receita para antimicrobiano",tipo:"Controle de antimicrobiano",ret:"Sim",modo:"Uso conforme prescrição.",posologia:"Seguir exatamente a prescrição e a apresentação.",obs:"Antimicrobianos seguem regras sanitárias específicas."},
+"azitromicina":{nome:"Azitromicina",ativo:"azitromicina",receita:"Receita para antimicrobiano",tipo:"Controle de antimicrobiano",ret:"Sim",modo:"Uso conforme prescrição.",posologia:"Seguir exatamente a prescrição.",obs:"Confirme a regra vigente antes da dispensação."},
+"loratadina":{nome:"Loratadina",ativo:"loratadina",receita:"Não exige receita para dispensação comum",tipo:"MIP / isento de receita",ret:"Não",modo:"Uso conforme bula.",posologia:"Confira concentração e bula.",obs:"Confira a apresentação."},
+"omeprazol":{nome:"Omeprazol",ativo:"omeprazol",receita:"Verificar apresentação",tipo:"Conforme apresentação",ret:"Verificar",modo:"Uso conforme bula ou orientação profissional.",posologia:"Confira concentração e indicação.",obs:"A classificação pode depender da apresentação."},
+"losartana":{nome:"Losartana",ativo:"losartana potássica",receita:"Receita médica",tipo:"Receita simples",ret:"Não",modo:"Uso oral conforme prescrição.",posologia:"Seguir dose e horários prescritos.",obs:"Não altere o tratamento sem orientação profissional."},
+"metformina":{nome:"Metformina",ativo:"cloridrato de metformina",receita:"Receita médica",tipo:"Receita simples",ret:"Não",modo:"Uso oral conforme prescrição.",posologia:"Seguir dose e horários prescritos.",obs:"A dose depende da apresentação e do paciente."},
+"clonazepam":{nome:"Clonazepam",ativo:"clonazepam",receita:"Controle especial",tipo:"Notificação de Receita B1",ret:"Sim",modo:"Uso oral conforme prescrição.",posologia:"Não informar dose automática; conferir prescrição e bula.",obs:"Confirme concentração, apresentação e quantidade."},
+"ritalina":{nome:"Ritalina®",ativo:"metilfenidato",receita:"Controle especial",tipo:"Notificação de Receita A",ret:"Sim",modo:"Uso oral conforme prescrição.",posologia:"Não informar dose automática; conferir prescrição e bula.",obs:"Confirme a apresentação e a legislação vigente."}
+};
+
+let meds={...base};
+try{const saved=JSON.parse(localStorage.getItem("mkfarma_medicamentos")||"{}");meds={...base,...saved}}catch(e){}
+
+function norm(v){
+return String(v||"").normalize("NFD").replace(/[\\u0300-\\u036f]/g,"").toLowerCase().trim();
+}
+function pesquisar(){
+const q=norm(document.getElementById("q").value);
+const out=document.getElementById("resultado");
+if(!q){out.className="empty";out.textContent="Digite um medicamento ou princípio ativo.";return;}
+const found=Object.values(meds).find(m=>norm(m.nome)===q||norm(m.ativo)===q) ||
+Object.values(meds).find(m=>norm(m.nome).includes(q)||norm(m.ativo).includes(q));
+if(!found){
+out.className="error";
+out.innerHTML="<b>Não encontrado.</b><br>Pesquise pelo nome ou princípio ativo, ou cadastre o medicamento.";
+return;
+}
+const precisa=String(found.ret).toLowerCase().startsWith("sim");
+out.className="card";
+out.innerHTML=
+'<div class="name">'+esc(found.nome)+'</div>'+
+'<div class="muted">Princípio ativo: '+esc(found.ativo)+'</div>'+
+'<div class="badges"><span class="badge '+(precisa?"warn":"ok")+'">'+(precisa?"🔒 Precisa de receita":"✓ Não precisa de receita")+'</span>'+
+'<span class="badge blue">'+esc(found.tipo)+'</span></div>'+
+'<div class="row"><span>Receita</span><b>'+esc(found.receita)+'</b></div>'+
+'<div class="row"><span>Retém receita</span><b>'+esc(found.ret)+'</b></div>'+
+'<div class="info"><b>💊 Modo de uso</b>'+esc(found.modo)+'</div>'+
+'<div class="info"><b>🕐 Posologia</b>'+esc(found.posologia)+'</div>'+
+'<div class="notice">⚠️ '+esc(found.obs)+'</div>';
+}
+function esc(v){return String(v??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#039;"}[c]));}
+
+document.getElementById("btnBuscar").addEventListener("click",pesquisar);
+document.getElementById("q").addEventListener("keydown",e=>{if(e.key==="Enter"){e.preventDefault();pesquisar();}});
+document.querySelectorAll("[data-search]").forEach(b=>b.addEventListener("click",()=>{document.getElementById("q").value=b.dataset.search;pesquisar();}));
+
+document.getElementById("btnCadastro").addEventListener("click",()=>{
+const f=document.getElementById("cadastro");f.style.display=f.style.display==="block"?"none":"block";
+});
+document.getElementById("btnSalvar").addEventListener("click",()=>{
+const nome=document.getElementById("nome").value.trim(), ativo=document.getElementById("ativo").value.trim();
+if(!nome||!ativo){alert("Preencha nome e princípio ativo.");return;}
+const m={nome,ativo,receita:document.getElementById("receita").value.trim()||"Não informado",tipo:document.getElementById("tipo").value.trim()||"Não informado",ret:document.getElementById("ret").value,modo:document.getElementById("modo").value.trim()||"Conferir bula/prescrição.",posologia:document.getElementById("posologia").value.trim()||"Conferir bula/prescrição.",obs:"Confirme a informação em fonte oficial antes da dispensação."};
+meds[norm(nome)]=m;
+try{localStorage.setItem("mkfarma_medicamentos",JSON.stringify(meds));}catch(e){}
+document.getElementById("q").value=nome;pesquisar();
+});
+})();
+</script>
+</body>
+</html>
